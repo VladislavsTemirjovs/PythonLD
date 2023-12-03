@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 
 # Constants
 WIDTH, HEIGHT = 1200, 700
@@ -9,11 +10,12 @@ MAP_WIDTH, MAP_HEIGHT = 3000, 1500
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
+RED = (255, 0, 0)
 MENU_FONT_SIZE = 48
 
 # Initialize pygame
 pygame.init()
-#test comment
+
 # Display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Cool Game")
@@ -73,7 +75,7 @@ class Projectile:
             self.rect.x += self.speed
 
     def draw(self, surface, camera_x, camera_y):
-        pygame.draw.rect(surface, BLACK, (self.rect.x - camera_x, self.rect.y - camera_y, self.rect.width, self.rect.height))
+        pygame.draw.rect(surface, RED, (self.rect.x - camera_x, self.rect.y - camera_y, self.rect.width, self.rect.height))
 
 # GameMap
 class GameMap:
@@ -126,10 +128,12 @@ game_map = GameMap([
     "#                                                           #",
     "#                                                           #",
     "#                                                           #",
+    "#                                                           #",
     "#############################################################",
 ])
 
 menu = Menu()
+
 
 # Game loop
 clock = pygame.time.Clock()
@@ -175,9 +179,17 @@ while running:
         for projectile in projectiles:
             projectile.move()
 
+        # Remove projectiles that hit obstacles
+        obstacles = game_map.get_obstacles(PROJECTILE_SIZE)
+        projectiles = [projectile for projectile in projectiles if not any(projectile.rect.colliderect(obstacle) for obstacle in obstacles)]
+
         # Remove projectiles that are out of the screen
         projectiles = [projectile for projectile in projectiles if
-                       0 <= projectile.rect.left <= MAP_WIDTH and 0 <= projectile.rect.top <= MAP_HEIGHT]
+                       PLAYER_SIZE <= projectile.rect.left <= MAP_WIDTH and PLAYER_SIZE <= projectile.rect.top <= MAP_HEIGHT]
+
+        # Move and draw enemies
+        for enemy in enemies:
+            enemy.draw(screen, player.rect.x - WIDTH // 2, player.rect.y - HEIGHT // 2)
 
         screen.fill(WHITE)
 
@@ -192,17 +204,14 @@ while running:
         # Draw projectiles
         for projectile in projectiles:
             projectile.draw(screen, camera_x, camera_y)
+            
 
-    # Refresh display
     pygame.display.flip()
 
-    # Set the frame rate
     clock.tick(60)
 
     # Update projectile delay
     projectile_delay = max(0, projectile_delay - 1)
 
-# Quit pygame
 pygame.quit()
 sys.exit()
-
