@@ -13,7 +13,7 @@ MENU_FONT_SIZE = 48
 
 # Initialize pygame
 pygame.init()
-
+#test comment
 # Display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Cool Game")
