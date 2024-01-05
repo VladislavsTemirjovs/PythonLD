@@ -1,5 +1,5 @@
-0. Uztaisīt timeru, kas rāda cik ilgi izdzīvo
-1. Uztaisīt, lai enemies randomā parādās uz ekrāna
+0. Uztaisīt timeru, kas rāda cik ilgi izdzīvo (Gatavs, izveidoju punktu skaitīšanu pēc izdzīvošanas laika)
+1. Uztaisīt, lai enemies randomā parādās uz ekrāna un iet virsū spēlētajam (laikam jāuztaisa max count viņiem)
 2. Uztaisīt projectile, kurus var šaut
 3. Uztaisīt "Stat" spēlētajam: hp, damage, speed, shot speed un "Enemy" : hp, damage, speed
 4. Uztaisīt, lai Enemy pieskaroties pie spēlētaja nodara bojājumus

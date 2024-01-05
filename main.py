@@ -10,6 +10,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.font = pg.font.Font('comici.ttf', 32)
         self.running = True
+        self.points = 0
         
         self.character_spritesheet = Spritesheet('img/character.png')
         self.terrain_spritesheet = Spritesheet('img/terrain.png')
@@ -60,9 +61,15 @@ class Game:
     def update(self):
         self.all_sprite.update()
         
+        self.points += self.clock.get_rawtime()/600
+        
     def draw(self):
         self.screen.fill(BLACK)
         self.all_sprite.draw(self.screen)
+        
+        timer_text = self.font.render(f'Score: {int(self.points)}', True, WHITE)
+        self.screen.blit(timer_text, (10,10))
+        
         self.clock.tick(FPS)
         pg.display.update()
         
