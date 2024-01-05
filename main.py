@@ -98,6 +98,7 @@ class Game:
             mouse_pressed = pg.mouse.get_pressed()
             
             if restart_button.is_pressed(mouse_pos, mouse_pressed):
+                self.points = 0
                 self.new()
                 self.main()
                 

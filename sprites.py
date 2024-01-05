@@ -174,8 +174,6 @@ class Enemy(pygame.sprite.Sprite):
         self.animation_loop = 0
         self.movement_loop = 0
         self.max_travel = random.randint(7,30)
-        self.x_change = 0
-        self.y_change = 0
         
         self.image = self.game.enemy_spritesheet.get_sprite(0, 0, self.width, self.height)
         
@@ -201,64 +199,53 @@ class Enemy(pygame.sprite.Sprite):
         
     def update(self):
         self.movement()
-        self.animate()
-        
-        self.rect.x += self.x_change   
-        self.rect.x += self.x_change 
-        
-        self.x_change = 0
-        self.y_change = 0
+        self.animate()        
+
         
     def movement(self):
-        if self.facing == 'left':
-            self.x_change -= ENEMY_SPEED
-            self.movement_loop -= 1
-            if self.movement_loop <= -self.max_travel:
-               self.facing = 'right'  
-               
-        if self.facing == 'right':
-            self.x_change += ENEMY_SPEED
-            self.movement_loop += 1
-            if self.movement_loop >= self.max_travel:
-               self.facing = 'left'  
+        dx = self.game.player.rect.x - self.rect.x
+        dy = self.game.player.rect.y - self.rect.y
+         
+        if abs(dx) > abs(dy):
+            if dx > 0:
+                self.rect.x += ENEMY_SPEED
+                self.facing = 'right'
+            else:
+                self.rect.x -= ENEMY_SPEED
+                self.facing = 'left'
+        else:
+            if dy > 0:
+                self.rect.y += ENEMY_SPEED
+                self.facing = 'down'
+            else:
+                self.rect.y -= ENEMY_SPEED
+                self.facing = 'up'
                
     def animate(self):                    
         
         if self.facing == 'down':
-            if self.y_change == 0:
-                self.game.enemy_spritesheet.get_sprite(0, 0, self.width, self.height)
-            else:
-                self.image = self.down_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 0
+            self.image = self.down_animations[math.floor(self.animation_loop)]
+            self.animation_loop += 0.1
+            if self.animation_loop >= 3:
+                self.animation_loop = 0
                     
         if self.facing == 'up':
-            if self.y_change == 0:
-                self.game.enemy_spritesheet.get_sprite(0, 96, self.width, self.height)
-            else:
-                self.image = self.up_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 0
+            self.image = self.up_animations[math.floor(self.animation_loop)]
+            self.animation_loop += 0.1
+            if self.animation_loop >= 3:
+                self.animation_loop = 0
 
         if self.facing == 'left':
-            if self.x_change == 0:
-                self.game.enemy_spritesheet.get_sprite(0, 32, self.width, self.height)
-            else:
-                self.image = self.left_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 0
+            self.image = self.left_animations[math.floor(self.animation_loop)]
+            self.animation_loop += 0.1
+            if self.animation_loop >= 3:
+                self.animation_loop = 0
 
         if self.facing == 'right':
-            if self.x_change == 0:
-                self.game.enemy_spritesheet.get_sprite(0, 64, self.width, self.height)
-            else:
-                self.image = self.right_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 0
+            self.image = self.right_animations[math.floor(self.animation_loop)]
+            self.animation_loop += 0.1
+            if self.animation_loop >= 3:
+                self.animation_loop = 0
                     
 class Block(pygame.sprite.Sprite):
     def __init__(self,game,x,y):
