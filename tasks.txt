@@ -1,7 +1,7 @@
-1. Uztaisīt, lai projectile satiekot obstacle viņš pazūd
-2. Izveidot "Enemy" class, kas tiek randomā ģenerēti kartē un seko virsu spēlētājam (Izdomāt un uztaisīt max enemy count uz kartes)
-3. Uztaisīt, lai projectile satiekot "Enemy" pazūd paši un iznīcina Enemy
-4. Uztaisīt sprites un attēlus, lai nav tikai taisnstūri
-5. Uztaisīt "Stat" spēlētajam: hp, damage, speed, shot speed un "Enemy" : hp, damage, speed
-6. Uztaisīt, lai Enemy pieskaroties pie spēlētaja nodara bojājumus
-7. Uztaisīt spēlētajam vairākas iespējamas klases, kam atšķirīgi "stati" (Piemēram, warrior, mage, rogue utt.)
+0. Uztaisīt timeru, kas rāda cik ilgi izdzīvo
+1. Uztaisīt, lai enemies randomā parādās uz ekrāna
+2. Uztaisīt projectile, kurus var šaut
+3. Uztaisīt "Stat" spēlētajam: hp, damage, speed, shot speed un "Enemy" : hp, damage, speed
+4. Uztaisīt, lai Enemy pieskaroties pie spēlētaja nodara bojājumus
+5. Uztaisīt spēlētajam vairākas iespējamas klases, kam atšķirīgi "stati" (Piemēram, warrior, mage, rogue utt.)
+6. Uztaisīt pieeju klases izvēlei piee start ekrāna un pēc restart ekrāna atnākt atpakaļ uz starta ekrānu
