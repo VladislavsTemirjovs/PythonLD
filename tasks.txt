@@ -3,5 +3,5 @@
 2. Uztaisīt projectile, kurus var šaut
 3. Uztaisīt "Stat" spēlētajam: hp, damage, speed, shot speed un "Enemy" : hp, damage, speed
 4. Uztaisīt, lai Enemy pieskaroties pie spēlētaja nodara bojājumus
-5. Uztaisīt spēlētajam vairākas iespējamas klases, kam atšķirīgi "stati" (Piemēram, warrior, mage, rogue utt.)
+5. Uztaisīt spēlētajam vairākas iespējamas klases, kam atšķirīgi "stati" (Piemēram, warrior, mage, rogue utt.) (Daļēji pabeigts)
 6. Uztaisīt pieeju klases izvēlei piee start ekrāna un pēc restart ekrāna atnākt atpakaļ uz starta ekrānu

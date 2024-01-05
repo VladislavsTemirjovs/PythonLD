@@ -10,8 +10,12 @@ ENEMY_LAYER = 3
 BLOCK_LAYER = 2
 GROUND_LAYER = 1
 
-PLAYER_SPEED = 3
+PLAYER_STATS = {"mage": {"damage" : 2, "speed": 2, "hp": 10, "range": 3},
+                "peasant": {"damage" : 2, "speed": 4, "hp": 15, "range": 1},
+                "soldier": {"damage" : 4, "speed": 2, "hp": 30, "range": 1}}
 ENEMY_SPEED = 1
+ENEMY_DAMAGE = 1
+DAMAGE_COOLDOWN = 1.0
 
 #Krāsa
 RED = (255, 0, 0)
