@@ -2,6 +2,7 @@ import pygame as pg
 from sprites import *
 from config import *
 import sys
+import random
 
 
 class Game:
@@ -18,7 +19,10 @@ class Game:
                                       "soldier": Spritesheet('img/soldier.png'),
                                       "mage": Spritesheet('img/mage.png')}
         self.terrain_spritesheet = Spritesheet('img/terrain.png')
-        self.enemy_spritesheet = Spritesheet('img/enemy.png')
+        self.enemy_spritesheet = {"basic": Spritesheet('img/enemy.png'),
+                                  "lowhp": Spritesheet('img/lowhp.png'),
+                                  "lowdmg": Spritesheet('img/lowdmg.png'),
+                                  "lowspeed": Spritesheet('img/lowspeed.png')}
         self.intro_background = pg.image.load('img/introbackground.png')
         self.go_background = pg.image.load('img/gameover.png')
         self.attack_spritesheet = Spritesheet('img/attack.png')
@@ -27,8 +31,17 @@ class Game:
         self.ENEMY_LAYER = ENEMY_LAYER
         self.BLOCK_LAYER = BLOCK_LAYER
         self.GROUND_LAYER = GROUND_LAYER
-        self.WIDTH = 1280
-        self.HEIGHT = 640       
+        self.WIDTH = WIDTH
+        self.HEIGHT = HEIGHT
+        self.spawn_points = []
+        
+        self.level_up_interval = LEVEL_UP_DELAY
+        self.level_up_event = pg.USEREVENT+1
+        pg.time.set_timer(self.level_up_event, self.level_up_interval) 
+        
+        self.new_enemy_interval = ENEmy_SPAWN_DELAY
+        self.new_enemy_event = pg.USEREVENT+2
+        pg.time.set_timer(self.new_enemy_event, self.new_enemy_interval)     
         
     def create_tilemap(self):
         for i, row in enumerate(tilemap):
@@ -39,7 +52,9 @@ class Game:
                 if column == "P":
                     self.player = Player(self,j,i,self.player_class)
                 if column == "E":
-                    Enemy(self,j,i)
+                    Enemy(self,j,i,"basic")
+                if column == "S":
+                    self.spawn_points.append(Spawn(self,j,i))
             
         
     def new(self):
@@ -61,13 +76,28 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     self.handle_attack()
+                    
+            if event.type == self.level_up_event:
+                if self.player.stats["level"] >= 20:
+                    pass
+                else:
+                    self.player.stats = PLAYER_LEVELS[self.player.player_class][str(self.player.stats["level"]+1)]
+                    
+            if event.type == self.new_enemy_event:
+                for spawner in self.spawn_points:
+                    spawner.spawn_enemy()
+                
+                
+                
     def handle_attack(self):
         Attack(self, self.player.rect.x, self.player.rect.y + TILESIZE, self.player.facing)   
     
     def update(self):
         self.events()
         self.all_sprite.update()
-        self.points += self.clock.get_rawtime() / 600  
+        self.points += self.clock.tick() / 100
+        
+
         
     def draw(self):
         self.screen.fill(BLACK)
@@ -81,6 +111,9 @@ class Game:
         stats_text2 = self.font_stats.render(f'Damage: {self.player.stats["damage"]} | Range: {self.player.stats["range"]}', True, WHITE)
         stats_rect2 = stats_text2.get_rect(topright=(WIDTH - 10, 26))
         self.screen.blit(stats_text2, stats_rect2)
+        stats_text3 = self.font_stats.render(f'Level: {self.player.stats["level"]}', True, WHITE)
+        stats_rect3 = stats_text3.get_rect(topright=(WIDTH - 10, 42))
+        self.screen.blit(stats_text3, stats_rect3)
 
         
         self.clock.tick(FPS)

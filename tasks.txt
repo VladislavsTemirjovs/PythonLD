@@ -1,7 +1,7 @@
 0. Uztaisīt timeru, kas rāda cik ilgi izdzīvo (Gatavs, izveidoju punktu skaitīšanu pēc izdzīvošanas laika)
-1. Uztaisīt, lai enemies randomā parādās uz ekrāna un iet virsū spēlētajam (laikam jāuztaisa max count viņiem)
+1. Uztaisīt, lai enemies randomā parādās uz ekrāna un iet virsū spēlētajam (Gatavs)
 2. Uztaisīt projectile, kurus var šaut (Gatavs, tikai jānomaina animation laikam)
-3. Uztaisīt "Stat" spēlētajam: hp, damage, speed, shot speed un "Enemy" : hp, damage, speed
-4. Uztaisīt, lai Enemy pieskaroties pie spēlētaja nodara bojājumus
-5. Uztaisīt spēlētajam vairākas iespējamas klases, kam atšķirīgi "stati" (Piemēram, warrior, mage, rogue utt.) (Daļēji pabeigts)
-6. Uztaisīt pieeju klases izvēlei piee start ekrāna un pēc restart ekrāna atnākt atpakaļ uz starta ekrānu
+3. Uztaisīt "Stat" spēlētajam: hp, damage, speed, shot speed un "Enemy" : hp, damage, speed (Gatavs)
+4. Uztaisīt, lai Enemy pieskaroties pie spēlētaja nodara bojājumus (Gatavs)
+5. Uztaisīt spēlētajam vairākas iespējamas klases, kam atšķirīgi "stati" (Piemēram, warrior, mage, rogue utt.) (Gatavs)
+6. Uztaisīt pieeju klases izvēlei piee start ekrāna un pēc restart ekrāna atnākt atpakaļ uz starta ekrānu (Kinda gatavs)
