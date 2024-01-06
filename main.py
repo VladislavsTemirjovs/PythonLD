@@ -7,7 +7,7 @@ import sys
 class Game:
     def __init__(self):
         pg.init()
-        self.screen = pg.display.set_mode((WIDTH,HEIGHT))
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
         self.font = pg.font.Font('comici.ttf', 32)
         self.font_stats = pg.font.Font('comici.ttf', 16)
@@ -22,6 +22,13 @@ class Game:
         self.intro_background = pg.image.load('img/introbackground.png')
         self.go_background = pg.image.load('img/gameover.png')
         self.attack_spritesheet = Spritesheet('img/attack.png')
+
+        self.PLAYER_LAYER = PLAYER_LAYER
+        self.ENEMY_LAYER = ENEMY_LAYER
+        self.BLOCK_LAYER = BLOCK_LAYER
+        self.GROUND_LAYER = GROUND_LAYER
+        self.WIDTH = 1280
+        self.HEIGHT = 640       
         
     def create_tilemap(self):
         for i, row in enumerate(tilemap):
@@ -53,19 +60,14 @@ class Game:
             
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
-                    if self.player.facing == 'up':
-                        Attack(self, self.player.rect.x, self.player.rect.y - TILESIZE)
-                    if self.player.facing == 'down':
-                        Attack(self, self.player.rect.x, self.player.rect.y + TILESIZE)
-                    if self.player.facing == 'left':
-                        Attack(self, self.player.rect.x - TILESIZE, self.player.rect.y)
-                    if self.player.facing == 'right':
-                        Attack(self, self.player.rect.x + TILESIZE, self.player.rect.y)       
+                    self.handle_attack()
+    def handle_attack(self):
+        Attack(self, self.player.rect.x, self.player.rect.y + TILESIZE, self.player.facing)   
     
     def update(self):
+        self.events()
         self.all_sprite.update()
-        
-        self.points += self.clock.get_rawtime()/600
+        self.points += self.clock.get_rawtime() / 600  
         
     def draw(self):
         self.screen.fill(BLACK)
