@@ -3,7 +3,7 @@ WIDTH = 1280    #32*40
 HEIGHT = 640    #32*20
 TILESIZE = 32
 FPS = 60
-LEVEL_UP_DELAY = 25000 #25sekundes skaitlis ir milisekundēs
+LEVEL_UP_DELAY = 15000 #15sekundes skaitlis ir milisekundēs
 ENEmy_SPAWN_DELAY = 2500 #ik pēc 2.5 sekundes parādās jauni pretinieki
 
 #Slāņu izvietojums
