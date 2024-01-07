@@ -3,8 +3,9 @@ WIDTH = 1280    #32*40
 HEIGHT = 640    #32*20
 TILESIZE = 32
 FPS = 60
-LEVEL_UP_DELAY = 15000 #15sekundes skaitlis ir milisekundēs
-ENEmy_SPAWN_DELAY = 2500 #ik pēc 2.5 sekundes parādās jauni pretinieki
+LEVEL_UP_DELAY = 1500 #15sekundes skaitlis ir milisekundēs
+ENEMY_SPAWN_DELAY = 2500 #ik pēc 3 sekundēm parādās jauni pretinieki
+BOSS_SPAWN_DELAY = 3000 #ik pēc minūtes parādās boss
 
 #Slāņu izvietojums
 PLAYER_LAYER = 4
@@ -12,6 +13,8 @@ ENEMY_LAYER = 3
 BLOCK_LAYER = 2
 GROUND_LAYER = 1
 
+ENEMY_TYPES = ["basic", "lowhp", "lowdmg", "lowspeed"]
+BOSS_TYPES = ["lowhp", "lowdmg", "lowspeed"]
 PLAYER_STATS = {"mage": {"damage" : 6, "speed": 3, "hp": 20, "range": 3, "shotspeed": 0.5, "level": 0},
                 "peasant": {"damage" : 2, "speed": 4, "hp": 30, "range": 2, "shotspeed": 0.5, "level": 0},
                 "soldier": {"damage" : 4, "speed": 2, "hp": 45, "range": 1,"shotspeed": 0.5, "level": 0}}
@@ -20,6 +23,11 @@ ENEMY_STATS = {"basic": {"damage" : 2, "speed": 1, "hp": 10},
                "lowhp": {"damage" : 8, "speed": 2, "hp": 5},
                "lowdmg": {"damage" : 2, "speed": 3, "hp": 15},
                "lowspeed": {"damage" : 5, "speed": 1, "hp": 30},}
+
+BOSS_STATS = {
+               "lowhp": {"damage" : 16, "speed": 2, "hp": 30},
+               "lowdmg": {"damage" : 5, "speed": 3, "hp": 60},
+               "lowspeed": {"damage" : 10, "speed": 1, "hp": 90},}
 
 
 PLAYER_LEVELS = {"mage": {"1": {"damage" : 7, "speed": 3, "hp": 20, "range": 3, "shotspeed": 0.5, "level": 1},

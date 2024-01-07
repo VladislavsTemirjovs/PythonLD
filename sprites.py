@@ -5,13 +5,14 @@ import random
 import time
 
 class Spritesheet:
-    def __init__(self, file):
+    def __init__(self, file, color_key):
         self.sheet = pygame.image.load(file).convert()
+        self.color_key = color_key
 
     def get_sprite(self, x, y, width, height):
         sprite = pygame.Surface([width, height])
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
-        sprite.set_colorkey(BLACK)
+        sprite.set_colorkey(self.color_key)
         return sprite         
 
 class Player(pygame.sprite.Sprite):
@@ -36,7 +37,6 @@ class Player(pygame.sprite.Sprite):
         self.animation_loop = 0
 
         self.image = self.game.character_spritesheet[self.player_class].get_sprite(0, 0, self.width, self.height)
-
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -178,7 +178,7 @@ class Player(pygame.sprite.Sprite):
         self.stats = PLAYER_LEVELS[self.player_class][str(level)].copy()
                     
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, enemy_type):
+    def __init__(self, game, x, y, enemy_type, difficulty):
         self.game = game
         self._layer = ENEMY_LAYER
         self.groups = self.game.all_sprite, self.game.enemies
@@ -188,7 +188,10 @@ class Enemy(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+        self.difficulty = difficulty
         self.stats = ENEMY_STATS[enemy_type]
+        self.stats["hp"] *= self.difficulty
+        self.stats["damage"] *= self.difficulty
         
         self.animation_loop = 0
         self.movement_loop = 0
@@ -294,6 +297,109 @@ class Enemy(pygame.sprite.Sprite):
                     else:
                         self.rect.y += self.stats["speed"]        
                     
+class Boss(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, boss_type, difficulty):
+        self.game = game
+        self._layer = ENEMY_LAYER
+        self.groups = self.game.all_sprite, self.game.enemies
+        pygame.sprite.Sprite.__init__(self, self.groups)  
+        
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE * 3
+        self.height = TILESIZE * 3
+        self.difficulty = difficulty
+        self.stats = BOSS_STATS[boss_type]
+        self.stats["hp"] *= self.difficulty * 0.75
+        self.stats["damage"] *= self.difficulty * 0.75
+        
+        self.animation_loop = 0
+        self.movement_loop = 0
+        self.boss_type = boss_type
+        
+        if self.boss_type == "lowhp":
+            self.image = self.game.boss_spritesheet.get_sprite(0, 288, self.width, self.height)
+        elif self.boss_type == "lowdmg":
+            self.image = self.game.boss_spritesheet.get_sprite(0, 0, self.width, self.height)
+        elif self.boss_type == "lowspeed":
+            self.image = self.game.boss_spritesheet.get_sprite(0, 96, self.width, self.height)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        
+        if self.boss_type == "lowhp":
+            self.animations = [self.game.boss_spritesheet.get_sprite(0, 288, self.width, self.height),
+                           self.game.boss_spritesheet.get_sprite(96, 288, self.width, self.height),
+                           self.game.boss_spritesheet.get_sprite(192, 288, self.width, self.height)]
+        elif self.boss_type == "lowdmg":
+            self.animations = [self.game.boss_spritesheet.get_sprite(0, 0, self.width, self.height),
+                           self.game.boss_spritesheet.get_sprite(96, 0, self.width, self.height),
+                           self.game.boss_spritesheet.get_sprite(192, 0, self.width, self.height)]
+        elif self.boss_type == "lowspeed":
+            self.animations = [self.game.boss_spritesheet.get_sprite(0, 96, self.width, self.height),
+                           self.game.boss_spritesheet.get_sprite(96, 96, self.width, self.height),
+                           self.game.boss_spritesheet.get_sprite(192, 96, self.width, self.height)]
+
+            
+    def update(self):
+        self.movement()
+        self.check_collision()
+        self.animate()
+    
+    def movement(self):
+        dx = self.game.player.rect.x - self.rect.x
+        dy = self.game.player.rect.y - self.rect.y
+         
+        if abs(dx) > abs(dy):
+            if dx > 0:
+                self.rect.x += self.stats["speed"]
+                self.facing = 'right'
+            else:
+                self.rect.x -= self.stats["speed"]
+                self.facing = 'left'
+        else:
+            if dy > 0:
+                self.rect.y += self.stats["speed"]
+                self.facing = 'down'
+            else:
+                self.rect.y -= self.stats["speed"]
+                self.facing = 'up'
+                
+    def animate(self):                    
+        
+        self.image = self.animations[math.floor(self.animation_loop)]
+        self.animation_loop += 0.1
+        if self.animation_loop >= 3:
+           self.animation_loop = 0
+
+    def check_collision(self):
+            block_hit_list = pygame.sprite.spritecollide(self, self.game.blocks, False)
+            enemy_hit_list = pygame.sprite.spritecollide(self, self.game.enemies, False)
+    
+            for block in block_hit_list:
+                if self.facing == 'right':
+                    self.rect.right = block.rect.left
+                elif self.facing == 'left':
+                    self.rect.left = block.rect.right
+                elif self.facing == 'down':
+                    self.rect.bottom = block.rect.top
+                elif self.facing == 'up':
+                    self.rect.top = block.rect.bottom
+    
+            for enemy in enemy_hit_list:
+                if enemy != self:
+                    # Move away from the colliding enemy
+                    if self.rect.x < enemy.rect.x:
+                        self.rect.x -= self.stats["speed"]
+                    else:
+                        self.rect.x += self.stats["speed"]
+    
+                    if self.rect.y < enemy.rect.y:
+                        self.rect.y -= self.stats["speed"]
+                    else:
+                        self.rect.y += self.stats["speed"]
+    
+
 class Block(pygame.sprite.Sprite):
     def __init__(self,game,x,y):
         
@@ -532,9 +638,9 @@ class Spawn(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
     
-    def spawn_enemy(self):
+    def spawn_enemy(self,difficulty):
         count = random.randint(0,2)
-        enemy_types = ["basic", "lowhp", "lowdmg", "lowspeed"]
+        ENEMY_TYPES = ["basic", "lowhp", "lowdmg", "lowspeed"]
         k = random.randint(0,3)
         for i in range(count):
-            Enemy(self.game,self.x/TILESIZE,self.y/TILESIZE,enemy_types[k])
+            Enemy(self.game,self.x/TILESIZE,self.y/TILESIZE,ENEMY_TYPES[k],difficulty)

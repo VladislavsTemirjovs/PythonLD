@@ -2,8 +2,7 @@ import pygame as pg
 from sprites import *
 from config import *
 import sys
-import random
-
+import math
 
 class Game:
     def __init__(self):
@@ -15,17 +14,18 @@ class Game:
         self.running = True
         self.points = 0
         self.player_class = "peasant"
-        self.character_spritesheet = {"peasant": Spritesheet('img/peasant.png'),
-                                      "soldier": Spritesheet('img/soldier.png'),
-                                      "mage": Spritesheet('img/mage.png')}
-        self.terrain_spritesheet = Spritesheet('img/terrain.png')
-        self.enemy_spritesheet = {"basic": Spritesheet('img/enemy.png'),
-                                  "lowhp": Spritesheet('img/lowhp.png'),
-                                  "lowdmg": Spritesheet('img/lowdmg.png'),
-                                  "lowspeed": Spritesheet('img/lowspeed.png')}
+        self.character_spritesheet = {"peasant": Spritesheet('img/peasant.png',BLACK),
+                                      "soldier": Spritesheet('img/soldier.png',BLACK),
+                                      "mage": Spritesheet('img/mage.png',BLACK)}
+        self.terrain_spritesheet = Spritesheet('img/terrain.png',BLACK)
+        self.enemy_spritesheet = {"basic": Spritesheet('img/enemy.png',BLACK),
+                                  "lowhp": Spritesheet('img/lowhp.png',BLACK),
+                                  "lowdmg": Spritesheet('img/lowdmg.png',BLACK),
+                                  "lowspeed": Spritesheet('img/lowspeed.png',BLACK)}
+        self.boss_spritesheet = Spritesheet('img/Boss.png', WHITE)
         self.intro_background = pg.image.load('img/introbackground.png')
         self.go_background = pg.image.load('img/gameover.png')
-        self.attack_spritesheet = Spritesheet('img/attack.png')
+        self.attack_spritesheet = Spritesheet('img/attack.png',BLACK)
 
         self.PLAYER_LAYER = PLAYER_LAYER
         self.ENEMY_LAYER = ENEMY_LAYER
@@ -34,14 +34,19 @@ class Game:
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
         self.spawn_points = []
+        self.difficulty = 1
         
         self.level_up_interval = LEVEL_UP_DELAY
-        self.level_up_event = pg.USEREVENT+1
+        self.level_up_event = pg.USEREVENT+0
         pg.time.set_timer(self.level_up_event, self.level_up_interval) 
         
-        self.new_enemy_interval = ENEmy_SPAWN_DELAY
-        self.new_enemy_event = pg.USEREVENT+2
-        pg.time.set_timer(self.new_enemy_event, self.new_enemy_interval)     
+        self.new_enemy_interval = ENEMY_SPAWN_DELAY
+        self.new_enemy_event = pg.USEREVENT+1
+        pg.time.set_timer(self.new_enemy_event, self.new_enemy_interval)
+        
+        self.new_boss_interval = BOSS_SPAWN_DELAY
+        self.new_boss_event = pg.USEREVENT+2
+        pg.time.set_timer(self.new_boss_event, self.new_boss_interval)     
         
     def create_tilemap(self):
         for i, row in enumerate(tilemap):
@@ -52,7 +57,7 @@ class Game:
                 if column == "P":
                     self.player = Player(self,j,i,self.player_class)
                 if column == "E":
-                    Enemy(self,j,i,"basic")
+                    Enemy(self,j,i,"basic",self.difficulty)
                 if column == "S":
                     self.spawn_points.append(Spawn(self,j,i))
             
@@ -85,7 +90,14 @@ class Game:
                     
             if event.type == self.new_enemy_event:
                 for spawner in self.spawn_points:
-                    spawner.spawn_enemy()
+                    spawner.spawn_enemy(self.difficulty)
+                    
+            if event.type == self.new_boss_event:
+                for sprite in self.enemies:
+                    sprite.kill()
+                type = random.randint(0,2)
+                Boss(self, 20,10,BOSS_TYPES[type],self.difficulty)
+                self.difficulty += 0.25
                 
                 
                 
@@ -105,7 +117,7 @@ class Game:
         
         timer_text = self.font.render(f'Score: {int(self.points)}', True, WHITE)
         self.screen.blit(timer_text, (10,10))
-        stats_text1 = self.font_stats.render(f'HP: {self.player.stats["hp"]} | Speed: {self.player.stats["speed"]}', True, WHITE)
+        stats_text1 = self.font_stats.render(f'HP: {math.floor(self.player.stats["hp"])} | Speed: {self.player.stats["speed"]}', True, WHITE)
         stats_rect1 = stats_text1.get_rect(topright=(WIDTH - 10, 10))
         self.screen.blit(stats_text1, stats_rect1)
         stats_text2 = self.font_stats.render(f'Damage: {self.player.stats["damage"]} | Range: {self.player.stats["range"]}', True, WHITE)
