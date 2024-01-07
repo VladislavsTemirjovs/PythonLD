@@ -3,9 +3,9 @@ WIDTH = 1280    #32*40
 HEIGHT = 640    #32*20
 TILESIZE = 32
 FPS = 60
-LEVEL_UP_DELAY = 1500 #15sekundes skaitlis ir milisekundēs
-ENEMY_SPAWN_DELAY = 2500 #ik pēc 3 sekundēm parādās jauni pretinieki
-BOSS_SPAWN_DELAY = 3000 #ik pēc minūtes parādās boss
+LEVEL_UP_DELAY = 15000 #15sekundes skaitlis ir milisekundēs
+ENEMY_SPAWN_DELAY = 3000 #ik pēc 3 sekundēm parādās jauni pretinieki
+BOSS_SPAWN_DELAY = 60000 #ik pēc minūtes parādās boss
 
 #Slāņu izvietojums
 PLAYER_LAYER = 4
