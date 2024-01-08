@@ -7,13 +7,15 @@ import math
 class Game:
     def __init__(self):
         pg.init()
+#pamata atribūtu izveide
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
         self.font = pg.font.Font('comici.ttf', 32)
         self.font_stats = pg.font.Font('comici.ttf', 16)
         self.running = True
         self.points = 0
-        self.player_class = "peasant"
+        
+#Attēlu inicializācija
         self.character_spritesheet = {"peasant": Spritesheet('img/peasant.png',BLACK),
                                       "soldier": Spritesheet('img/soldier.png',BLACK),
                                       "mage": Spritesheet('img/mage.png',BLACK)}
@@ -28,6 +30,7 @@ class Game:
         self.go_background = pg.image.load('img/gameover.png')
         self.attack_spritesheet = Spritesheet('img/attack.png',BLACK)
 
+#Attēlu savstarpējs novietojums
         self.PLAYER_LAYER = PLAYER_LAYER
         self.ENEMY_LAYER = ENEMY_LAYER
         self.BLOCK_LAYER = BLOCK_LAYER
@@ -37,6 +40,7 @@ class Game:
         self.spawn_points = []
         self.difficulty = 1
         
+#Eventu izveide
         self.level_up_interval = LEVEL_UP_DELAY
         self.level_up_event = pg.USEREVENT+0
         pg.time.set_timer(self.level_up_event, self.level_up_interval) 
@@ -47,8 +51,9 @@ class Game:
         
         self.new_boss_interval = BOSS_SPAWN_DELAY
         self.new_boss_event = pg.USEREVENT+2
-        pg.time.set_timer(self.new_boss_event, self.new_boss_interval)     
-        
+        pg.time.set_timer(self.new_boss_event, self.new_boss_interval) 
+            
+#Kartes inicializācija
     def create_tilemap(self):
         for i, row in enumerate(tilemap):
             for j, column in enumerate(row):
@@ -62,7 +67,7 @@ class Game:
                 if column == "S":
                     self.spawn_points.append(Spawn(self,j,i))
             
-        
+#Jaunas spēles izveide, tiek inicializēti attēli un to novietojums
     def new(self):
         self.playing = True
         self.all_sprite = pg.sprite.LayeredUpdates()
@@ -72,7 +77,7 @@ class Game:
         
         self.create_tilemap()
         
-        
+#Eventu pārbaude un izpilde       
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -101,17 +106,18 @@ class Game:
                 self.difficulty += 0.25
                 
                 
-                
+#Funkcija, kas atbild par uzbrukumu veidošanu                
     def handle_attack(self):
         Attack(self, self.player.rect.x, self.player.rect.y + TILESIZE, self.player.facing)   
-    
+
+   
     def update(self):
         self.events()
         self.all_sprite.update()
         self.points += self.clock.tick() / 100
         
 
-        
+#Ekrāna zīmēšana        
     def draw(self):
         self.screen.fill(BLACK)
         self.all_sprite.draw(self.screen)
@@ -132,18 +138,17 @@ class Game:
         self.clock.tick(FPS)
         pg.display.update()
         
-        
+#Galvenais spēles ekrāns, kur notiek spēle       
     def main(self):
         while self.playing:
             self.events()
             self.update()
             self.draw()
-        
+ 
+#Zaudējuma ekrāns       
     def game_over(self):
         text = self.font.render('Game Over', True, WHITE)
         text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
-
-        #restart_button = Button(10, 50, 150, 50, WHITE, BLACK, 'Restart', 32)
         restart_peasant_button = Button(10, 150, 300, 50, WHITE, BLACK, 'Restart as Peasant', 32)
         restart_mage_button = Button(10, 250, 300, 50, WHITE, BLACK, 'Restart as Mage', 32)
         restart_soldier_button = Button(10, 350, 300, 50, WHITE, BLACK, 'Restart as Soldier', 32)
@@ -159,10 +164,6 @@ class Game:
             mouse_pos = pg.mouse.get_pos()
             mouse_pressed = pg.mouse.get_pressed()
             
-            #if restart_button.is_pressed(mouse_pos, mouse_pressed):
-            #    self.points = 0
-            #    self.new()
-            #    self.main()
             
             if restart_peasant_button.is_pressed(mouse_pos, mouse_pressed):
                 self.player_class = "peasant"
@@ -184,22 +185,18 @@ class Game:
                 
             self.screen.blit(self.go_background, (0,0))
             self.screen.blit(text, text_rect)
-           # self.screen.blit(restart_button.image, restart_button.rect)
             self.screen.blit(restart_peasant_button.image, restart_peasant_button.rect)
             self.screen.blit(restart_mage_button.image, restart_mage_button.rect)
             self.screen.blit(restart_soldier_button.image, restart_soldier_button.rect)
             self.clock.tick(FPS)
             pg.display.update()
-        
+
+#Sākuma ekrāns        
     def intro_screen(self):
         intro = True
         
         title = self.font.render('Python Lielais Darbs', True, BLACK)
         title_rect = title.get_rect(x=10, y=10)
-        #class_title = self.font.render(f'You will play as {str(self.player_class)}', True, BLACK)
-        #class_title_rect = class_title.get_rect(x=250, y=10)
-        
-        #play_button = Button(10, 50, 200, 50, WHITE, BLACK, 'Play', 32)
         peasant_button = Button(10, 150, 300, 50, WHITE, BLACK, 'Play as Peasant', 32)
         mage_button = Button(10, 250, 300, 50, WHITE, BLACK, 'Play as Mage', 32)
         soldier_button = Button(10, 350, 300, 50, WHITE, BLACK, 'Play as Soldier', 32)
@@ -211,9 +208,6 @@ class Game:
                     self.running = False
             mouse_pos = pg.mouse.get_pos()
             mouse_pressed = pg.mouse.get_pressed()
-
-            #if play_button.is_pressed(mouse_pos, mouse_pressed):
-                #intro = False
             
             if peasant_button.is_pressed(mouse_pos,mouse_pressed):
                 self.player_class = "peasant"
@@ -229,14 +223,13 @@ class Game:
                 
             self.screen.blit(self.intro_background, (0,0))
             self.screen.blit(title, title_rect)
-            #self.screen.blit(class_title, class_title_rect)
-            #self.screen.blit(play_button.image, play_button.rect)
             self.screen.blit(peasant_button.image, peasant_button.rect)
             self.screen.blit(mage_button.image, mage_button.rect)
             self.screen.blit(soldier_button.image, soldier_button.rect)
             self.clock.tick(FPS)
             pg.display.update()
 
+#Spēles izveide un palaišana
 g = Game()
 g.intro_screen()
 g.new()

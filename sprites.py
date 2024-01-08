@@ -4,9 +4,11 @@ import math
 import random
 import time
 
+#Attēlu apstrāde un ielādēšana
 class Spritesheet:
     def __init__(self, file, key_color):
         self.sheet = pygame.image.load(file).convert()
+        #color_key atbild, lai attēla fons būtu caurspīdīgs
         self.color_key = key_color
 
     def get_sprite(self, x, y, width, height):
@@ -15,6 +17,7 @@ class Spritesheet:
         sprite.set_colorkey(self.color_key)
         return sprite         
 
+#Spēlētaja klase, kas manto sprite klases īpašības
 class Player(pygame.sprite.Sprite):
     def __init__(self, game, x, y, player_class):
         self.game = game
@@ -22,6 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.groups = self.game.all_sprite
         pygame.sprite.Sprite.__init__(self, self.groups)
 
+        #Galvenie parametri
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.width = TILESIZE
@@ -29,6 +33,8 @@ class Player(pygame.sprite.Sprite):
         self.player_class = player_class
         self.stats = PLAYER_STATS[player_class].copy()
         self.last_damage_time = 0.0
+        self.shoot_cooldown = self.stats["shotspeed"]
+        self.last_shoot_time = 0.0   
 
         self.x_change = 0
         self.y_change = 0
@@ -41,7 +47,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        
 
+        #Animācijas massīvi
         self.down_animations = [self.game.character_spritesheet[self.player_class].get_sprite(0, 0, self.width, self.height),
                                 self.game.character_spritesheet[self.player_class].get_sprite(32, 0, self.width, self.height),
                                 self.game.character_spritesheet[self.player_class].get_sprite(64, 0, self.width, self.height)]    
@@ -57,10 +65,8 @@ class Player(pygame.sprite.Sprite):
         self.up_animations = [self.game.character_spritesheet[self.player_class].get_sprite(0, 96, self.width, self.height),
                            self.game.character_spritesheet[self.player_class].get_sprite(32, 96, self.width, self.height),
                            self.game.character_spritesheet[self.player_class].get_sprite(64, 96, self.width, self.height)]    
-    
-        self.shoot_cooldown = self.stats["shotspeed"]
-        self.last_shoot_time = 0.0     
-        
+      
+#Funkcija, kas izpilda visas spēlētāja funkcijas, lai spēlētājs varētu atrasties uz kartes       
     def update(self):
             self.movement()
             self.animate()
@@ -74,7 +80,8 @@ class Player(pygame.sprite.Sprite):
     
             self.x_change = 0
             self.y_change = 0
-    
+
+#Pārvietošanās funkcija   
     def movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -89,7 +96,8 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_s]:
             self.y_change += self.stats["speed"]
             self.facing = 'down'        
-            
+
+#Pārbaude vai nav saskarsmes ar briesmoņiem            
     def collide_enemy(self):
         current_time = time.time()
         if current_time - self.last_damage_time < DAMAGE_COOLDOWN:
@@ -102,7 +110,8 @@ class Player(pygame.sprite.Sprite):
             if self.stats["hp"] <= 0 :
                 self.kill()
                 self.game.playing = False
-                
+
+#Spēlētāja šaušanas funkcijas                
     def handle_shooting(self):
         keys = pygame.key.get_pressed()
         current_time = time.time()
@@ -116,6 +125,7 @@ class Player(pygame.sprite.Sprite):
         elif keys[pygame.K_RIGHT]:
             self.shoot('right', current_time)
 
+    #Izveido šāviena attēlu un norāda virzienu, nosaka vai ir pagājis pietiekami daudz laika no pēdējā šaviena
     def shoot(self, direction, current_time):
         if current_time - self.last_shoot_time < self.shoot_cooldown:
             return
@@ -125,7 +135,8 @@ class Player(pygame.sprite.Sprite):
         self.game.attacks.add(projectile)
 
         self.last_shoot_time = current_time                       
-            
+
+#Pārbauda saskaršanos ar sienām, ja saskarsme bija, tad spēlētājs nevar iet tajā virzienā           
     def collide_block(self, direction):
         if direction == "x":
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
@@ -142,7 +153,8 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y = hits[0].rect.top - self.rect.height
                 if self.y_change < 0:
                     self.rect.y = hits[0].rect.bottom
-                    
+
+#Funkcija, kas atbild par animāciju                    
     def animate(self):                    
         
         if self.facing == 'down':
@@ -180,10 +192,11 @@ class Player(pygame.sprite.Sprite):
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3:
                     self.animation_loop = 0 
-            
+#Funkcija, kas ļauj spēlētājam paaugstināt līmeni un tādā veidā mainās spēlētāja atribūti            
     def level_up(self, level):
         self.stats = PLAYER_LEVELS[self.player_class][str(level)].copy()
-                    
+
+#Briesmoņu klase                    
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, game, x, y, enemy_type,difficulty):
         self.game = game
@@ -198,8 +211,7 @@ class Enemy(pygame.sprite.Sprite):
         self.difficulty = difficulty
         self.stats = ENEMY_STATS[enemy_type].copy()
         self.stats["hp"] *= self.difficulty
-        self.stats["damage"] *= self.difficulty
-        
+        self.stats["damage"] *= self.difficulty       
         self.animation_loop = 0
         self.movement_loop = 0
         self.enemy_type = enemy_type
@@ -210,6 +222,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y  
         
+        #Briemoņu animācija
         self.down_animations = [self.game.enemy_spritesheet[self.enemy_type].get_sprite(0, 0, self.width, self.height),
                            self.game.enemy_spritesheet[self.enemy_type].get_sprite(32, 0, self.width, self.height),
                            self.game.enemy_spritesheet[self.enemy_type].get_sprite(64, 0, self.width, self.height)]    
@@ -231,7 +244,8 @@ class Enemy(pygame.sprite.Sprite):
         self.check_collision()
         self.animate()        
 
-        
+#Briesmoņu kustība, kustība notiek spēlētāja virzienā, ja starp spēlētāju un briesmoni x attālums ir lielāks nekā y attālums, tad kustība notiek pa x
+#Pretējā gadījumā kustība notiek pa y asi    
     def movement(self):
         dx = self.game.player.rect.x - self.rect.x
         dy = self.game.player.rect.y - self.rect.y
@@ -250,7 +264,7 @@ class Enemy(pygame.sprite.Sprite):
             else:
                 self.rect.y -= self.stats["speed"]
                 self.facing = 'up'
-               
+#Animācijas funkcija             
     def animate(self):                    
         
         if self.facing == 'down':
@@ -276,7 +290,8 @@ class Enemy(pygame.sprite.Sprite):
             self.animation_loop += 0.1
             if self.animation_loop >= 3:
                 self.animation_loop = 0
-                
+#Pārbauda, vai nav sadursmes ar šķēršļiem vai citiem briesmoņiem
+#Šķēršļu gadījumā kustība tiek pārtraukta, bet briesmoņu gadījumā tie attiet viens no otra                 
     def check_collision(self):
             block_hit_list = pygame.sprite.spritecollide(self, self.game.blocks, False)
             enemy_hit_list = pygame.sprite.spritecollide(self, self.game.enemies, False)
@@ -302,7 +317,8 @@ class Enemy(pygame.sprite.Sprite):
                         self.rect.y -= self.stats["speed"]
                     else:
                         self.rect.y += self.stats["speed"]        
-                    
+
+#Lielo briesmoņu klase, ļoti līdzīga briesmoņu klasei                    
 class Boss(pygame.sprite.Sprite):
     def __init__(self, game, x, y, boss_type, difficulty):
         self.game = game
@@ -394,7 +410,6 @@ class Boss(pygame.sprite.Sprite):
     
             for enemy in enemy_hit_list:
                 if enemy != self:
-                    # Move away from the colliding enemy
                     if self.rect.x < enemy.rect.x:
                         self.rect.x -= self.stats["speed"]
                     else:
@@ -404,7 +419,8 @@ class Boss(pygame.sprite.Sprite):
                         self.rect.y -= self.stats["speed"]
                     else:
                         self.rect.y += self.stats["speed"]
-                       
+
+#Kartes sienas jeb šķērsļi                       
 class Block(pygame.sprite.Sprite):
     def __init__(self,game,x,y):
         
@@ -423,7 +439,8 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-        
+ 
+#Kartes "zemes" slānis        
 class Ground(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
@@ -441,7 +458,8 @@ class Ground(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-        
+
+#Klase, kas veido pogas, kuras tiek izmantotas main.py, sākuma un beigu ekrānā       
 class Button:
     def __init__(self, x, y, width, height, fg, bg, content, fontsize):
         self.font = pygame.font.Font('comici.ttf', fontsize)
@@ -465,7 +483,8 @@ class Button:
         self.text = self.font.render(self.content, True, self.fg)
         self.text_rect = self.text.get_rect(center = (self.width/2, self.height/2))
         self.image.blit(self.text, self.text_rect)
-        
+
+#Pārbaude, vai poga ir nospiesta        
     def is_pressed(self, pos, pressed):
         if self.rect.collidepoint(pos):
             if pressed[0]:
@@ -473,7 +492,8 @@ class Button:
             else:
                 return False
         return False
-                
+
+#Klase, kas atbild par tiešo uzbrukumu, spēlētāja priekšā                
 class Attack(pygame.sprite.Sprite):
     def __init__(self, game, x, y, direction):
         super().__init__()
@@ -489,9 +509,9 @@ class Attack(pygame.sprite.Sprite):
         self.direction = direction
         self.speed = 8
         self.last_damage_time = 0.0
-
         self.animation_loop = 0
-
+        
+        #Animācijas attēli
         self.right_animations = [self.game.attack_spritesheet.get_sprite(0, 64, self.width, self.height),
                            self.game.attack_spritesheet.get_sprite(32, 64, self.width, self.height),
                            self.game.attack_spritesheet.get_sprite(64, 64, self.width, self.height),
@@ -517,7 +537,6 @@ class Attack(pygame.sprite.Sprite):
                          self.game.attack_spritesheet.get_sprite(128, 0, self.width, self.height)]
 
         self.image = self.down_animations[0]
-
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -551,6 +570,7 @@ class Attack(pygame.sprite.Sprite):
             self.rect.centery = player_center_y
             self.rect.left = player_center_x                
 
+#Pārbauda, vai nav saskarsmes ar briesmoni
     def collide(self):
         current_time = time.time()
         if current_time - self.last_damage_time < 0.25:
@@ -562,7 +582,7 @@ class Attack(pygame.sprite.Sprite):
             if hits[0].stats["hp"] <= 0:
                 hits[0].kill()
                 
-
+#Funkcija, kas veido animāciju
     def animate(self):
         direction = self.direction
     
@@ -578,7 +598,8 @@ class Attack(pygame.sprite.Sprite):
         self.animation_loop += 0.5
         if self.animation_loop >= 5:
             self.kill() 
-                                
+  
+#Šāvienu klase, kas veido lidojošus uzbrukumus                                
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, game, x, y, direction,player_class):
         super().__init__()
@@ -595,7 +616,7 @@ class Projectile(pygame.sprite.Sprite):
         self.speed = 8
         self.bullet_type = player_class
 
-
+        #Katrai klasei savs šāviena tips
         if self.bullet_type == "peasant":
             self.image = self.game.projectile_spritesheet.get_sprite(224, 480, TILESIZE, TILESIZE)
         elif self.bullet_type == "mage":
@@ -610,6 +631,7 @@ class Projectile(pygame.sprite.Sprite):
         elif direction == 'right':
             self.rect = self.image.get_rect(center=(x + TILESIZE, y + TILESIZE // 2))
 
+#Klase, kas atibild par šāviena kustību un pārbauda vai nav
     def update(self):
         if self.direction == 'up':
             self.rect.y -= self.speed
@@ -620,6 +642,7 @@ class Projectile(pygame.sprite.Sprite):
         elif self.direction == 'right':
             self.rect.x += self.speed
 
+#Ja notiek sadursme ar briesmoni, tad šāviens pazūd un briemonis saņem bojājumus
         enemy_hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if enemy_hits:
             enemy_hits[0].stats["hp"] -= self.game.player.stats["damage"]
@@ -630,7 +653,8 @@ class Projectile(pygame.sprite.Sprite):
         block_hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
         if block_hits:
             self.kill()        
-            
+
+#Klase, kura tiek izmnatota, lai veidotu jaunus briesmoņus, izveides koordinātes var mainīt config.py pie tilemap, burts "S"            
 class Spawn(pygame.sprite.Sprite):
     def __init__(self,game,x,y):
         self.game = game
@@ -648,7 +672,7 @@ class Spawn(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-    
+#Jaunu briesmoņu izveido no to "izveides punktiem"   
     def spawn_enemy(self, difficulty):
         count = random.randint(0,2)
         enemy_types = ["basic", "lowhp", "lowdmg", "lowspeed"]
