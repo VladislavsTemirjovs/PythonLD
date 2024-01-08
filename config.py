@@ -25,9 +25,9 @@ ENEMY_STATS = {"basic": {"damage" : 2, "speed": 1, "hp": 10},
                "lowspeed": {"damage" : 5, "speed": 1, "hp": 30},}
 
 BOSS_STATS = {
-               "lowhp": {"damage" : 16, "speed": 2, "hp": 30},
-               "lowdmg": {"damage" : 5, "speed": 3, "hp": 60},
-               "lowspeed": {"damage" : 10, "speed": 1, "hp": 90},}
+               "lowhp": {"damage" : 10, "speed": 2, "hp": 60},
+               "lowdmg": {"damage" : 4, "speed": 3, "hp": 90},
+               "lowspeed": {"damage" : 8, "speed": 1, "hp": 120},}
 
 
 PLAYER_LEVELS = {"mage": {"1": {"damage" : 7, "speed": 3, "hp": 20, "range": 3, "shotspeed": 0.5, "level": 1},

@@ -5,13 +5,14 @@ import random
 import time
 
 class Spritesheet:
-    def __init__(self, file):
+    def __init__(self, file, key_color):
         self.sheet = pygame.image.load(file).convert()
+        self.color_key = key_color
 
     def get_sprite(self, x, y, width, height):
         sprite = pygame.Surface([width, height])
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
-        sprite.set_colorkey(BLACK)
+        sprite.set_colorkey(self.color_key)
         return sprite         
 
 class Player(pygame.sprite.Sprite):
@@ -57,7 +58,7 @@ class Player(pygame.sprite.Sprite):
                            self.game.character_spritesheet[self.player_class].get_sprite(32, 96, self.width, self.height),
                            self.game.character_spritesheet[self.player_class].get_sprite(64, 96, self.width, self.height)]    
     
-        self.shoot_cooldown = 0.2
+        self.shoot_cooldown = self.stats["shotspeed"]
         self.last_shoot_time = 0.0     
         
     def update(self):
@@ -119,7 +120,7 @@ class Player(pygame.sprite.Sprite):
         if current_time - self.last_shoot_time < self.shoot_cooldown:
             return
 
-        projectile = Projectile(self.game, self.rect.x, self.rect.y, direction)
+        projectile = Projectile(self.game, self.rect.x, self.rect.y, direction, self.player_class)
         self.game.all_sprite.add(projectile)
         self.game.attacks.add(projectile)
 
@@ -184,7 +185,7 @@ class Player(pygame.sprite.Sprite):
         self.stats = PLAYER_LEVELS[self.player_class][str(level)].copy()
                     
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, enemy_type):
+    def __init__(self, game, x, y, enemy_type,difficulty):
         self.game = game
         self._layer = ENEMY_LAYER
         self.groups = self.game.all_sprite, self.game.enemies
@@ -198,7 +199,6 @@ class Enemy(pygame.sprite.Sprite):
         self.stats = ENEMY_STATS[enemy_type].copy()
         self.stats["hp"] *= self.difficulty
         self.stats["damage"] *= self.difficulty
-        self.stats = ENEMY_STATS[enemy_type]
         
         self.animation_loop = 0
         self.movement_loop = 0
@@ -404,9 +404,7 @@ class Boss(pygame.sprite.Sprite):
                         self.rect.y -= self.stats["speed"]
                     else:
                         self.rect.y += self.stats["speed"]
-    
-
-                    
+                       
 class Block(pygame.sprite.Sprite):
     def __init__(self,game,x,y):
         
@@ -580,10 +578,9 @@ class Attack(pygame.sprite.Sprite):
         self.animation_loop += 0.5
         if self.animation_loop >= 5:
             self.kill() 
-                
-                
+                                
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, direction):
+    def __init__(self, game, x, y, direction,player_class):
         super().__init__()
         self.game = game
         self._layer = game.PLAYER_LAYER
@@ -596,15 +593,15 @@ class Projectile(pygame.sprite.Sprite):
         self.height = TILESIZE
         self.direction = direction
         self.speed = 8
+        self.bullet_type = player_class
 
-        if direction == 'up':
-            self.image = self.game.attack_spritesheet.get_sprite(0, 0, self.width, self.height)
-        elif direction == 'down':
-            self.image = self.game.attack_spritesheet.get_sprite(0, 64, self.width, self.height)
-        elif direction == 'left':
-            self.image = self.game.attack_spritesheet.get_sprite(0, 96, self.width, self.height)
-        elif direction == 'right':
-            self.image = self.game.attack_spritesheet.get_sprite(0, 32, self.width, self.height)
+
+        if self.bullet_type == "peasant":
+            self.image = self.game.projectile_spritesheet.get_sprite(224, 480, TILESIZE, TILESIZE)
+        elif self.bullet_type == "mage":
+            self.image = self.game.projectile_spritesheet.get_sprite(352, 192, TILESIZE, TILESIZE)
+        elif self.bullet_type == "soldier":
+            self.image = self.game.projectile_spritesheet.get_sprite(512, 192, TILESIZE, TILESIZE)
 
         if direction == 'up' or direction == 'down':
             self.rect = self.image.get_rect(center=(x + TILESIZE // 2, y + TILESIZE // 2))
@@ -623,8 +620,11 @@ class Projectile(pygame.sprite.Sprite):
         elif self.direction == 'right':
             self.rect.x += self.speed
 
-        enemy_hits = pygame.sprite.spritecollide(self, self.game.enemies, True)
+        enemy_hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if enemy_hits:
+            enemy_hits[0].stats["hp"] -= self.game.player.stats["damage"]
+            if enemy_hits[0].stats["hp"] <= 0:
+                enemy_hits[0].kill()
             self.kill()
 
         block_hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
@@ -649,9 +649,9 @@ class Spawn(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
     
-    def spawn_enemy(self):
+    def spawn_enemy(self, difficulty):
         count = random.randint(0,2)
         enemy_types = ["basic", "lowhp", "lowdmg", "lowspeed"]
         k = random.randint(0,3)
         for i in range(count):
-            Enemy(self.game,self.x/TILESIZE,self.y/TILESIZE,enemy_types[k])
+            Enemy(self.game,self.x/TILESIZE,self.y/TILESIZE,enemy_types[k],difficulty)

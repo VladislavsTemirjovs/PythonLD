@@ -17,6 +17,7 @@ class Game:
         self.character_spritesheet = {"peasant": Spritesheet('img/peasant.png',BLACK),
                                       "soldier": Spritesheet('img/soldier.png',BLACK),
                                       "mage": Spritesheet('img/mage.png',BLACK)}
+        self.projectile_spritesheet =Spritesheet('img/projectile.png',BLACK)
         self.terrain_spritesheet = Spritesheet('img/terrain.png',BLACK)
         self.enemy_spritesheet = {"basic": Spritesheet('img/enemy.png',BLACK),
                                   "lowhp": Spritesheet('img/lowhp.png',BLACK),
