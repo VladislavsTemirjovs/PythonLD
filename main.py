@@ -195,7 +195,7 @@ class Game:
     def intro_screen(self):
         intro = True
         
-        title = self.font.render('Python Lielais Darbs', True, BLACK)
+        title = self.font.render('Not your average Survival Game', True, BLACK)
         title_rect = title.get_rect(x=10, y=10)
         peasant_button = Button(10, 150, 300, 50, WHITE, BLACK, 'Play as Peasant', 32)
         mage_button = Button(10, 250, 300, 50, WHITE, BLACK, 'Play as Mage', 32)
