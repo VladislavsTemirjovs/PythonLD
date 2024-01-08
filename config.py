@@ -4,7 +4,7 @@ HEIGHT = 640    #32*20
 FPS = 60
 
 #Event parametri, cik bieži tie notiek
-LEVEL_UP_DELAY = 15000 #15sekundes skaitlis ir milisekundēs
+LEVEL_UP_DELAY = 20000 #20sekundes skaitlis ir milisekundēs
 ENEMY_SPAWN_DELAY = 3000 #ik pēc 3 sekundēm parādās jauni pretinieki
 BOSS_SPAWN_DELAY = 60000 #ik pēc minūtes parādās boss
 
