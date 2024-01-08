@@ -189,7 +189,7 @@ class Enemy(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         self.difficulty = difficulty
-        self.stats = ENEMY_STATS[enemy_type]
+        self.stats = ENEMY_STATS[enemy_type].copy()
         self.stats["hp"] *= self.difficulty
         self.stats["damage"] *= self.difficulty
         
@@ -309,7 +309,7 @@ class Boss(pygame.sprite.Sprite):
         self.width = TILESIZE * 3
         self.height = TILESIZE * 3
         self.difficulty = difficulty
-        self.stats = BOSS_STATS[boss_type]
+        self.stats = BOSS_STATS[boss_type].copy()
         self.stats["hp"] *= self.difficulty * 0.75
         self.stats["damage"] *= self.difficulty * 0.75
         
